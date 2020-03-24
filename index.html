@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>每日一文</title>
+    <script src="./myajax.js"></script>
+    <script src="./jquery-3.4.1.js"></script>
+</head>
+<body>
+    <main>
+        <form action="#" id="form">
+            <input type="text" name="date" placeholder="输入日期">
+            <input id="submit" type="submit" value="search">
+        </form>
+        <div class="btns">
+            <button id="prevbtn">上一章</button>
+            <button id="nextbtn">下一章</button>
+        </div>
+        <div class="text">
+            <h2 id="title"></h2>
+            <div class="date">
+                <h4 id="author"></h4>
+                <h4 id="time"></h4>
+            </div>
+            <div id="content"></div>
+        </div>
+        <div id="random">点击获取随机文章</div>
+    </main>
+
+    <script>
+        //获取当天文章
+        var today = "";
+        var td = new Date();
+        today = "" + td.getFullYear() + add0(td.getMonth() + 1) + add0(td.getDate());
+        var prevdate, currdate, nextdate;
+        _.get("https://interface.meiriyiwen.com/article/today", {
+            dev: 1
+        }, function (d, e) {
+            createArticle(d.data.title, d.data.date.curr, d.data.author, d.data.content, d.data.date.prev, d.data.date.next);
+        })
+        function createArticle(title, date, author, content, prev, next) {
+            $("#title").empty().text(title);
+            $("#author").empty().text(author);
+            $("#time").empty().text(date);
+            $("#content").empty().html(content);
+            prevdate = prev;
+            currdate = date;
+            nextdate = next;
+        }
+        //获取指定时间的文章
+        $("#submit").click(function (e) {
+            e.preventDefault();
+            var res = _.formSerializeToJson($("#form")[0]);
+            requestArticleData(res.date);
+        });
+        //获取随机的文章
+        $("#random").click(function () {
+            _.get("https://interface.meiriyiwen.com/article/random", {
+                dev: 1
+            }, function (d, e) {
+                createArticle(d.data.title, d.data.date.curr, d.data.author, d.data.content, d.data.date.prev, d.data.date.next);
+            });
+        })
+        //点击前一天
+        $("#prevbtn").click(function () {
+            requestArticleData(prevdate);
+        });
+        //点击后一天
+        $("#nextbtn").click(function () {
+            if (parseInt(nextdate) <= parseInt(today)) {
+                requestArticleData(nextdate);
+            }
+        })
+        function requestArticleData(dt) {
+            _.get("https://interface.meiriyiwen.com/article/day", {
+                dev: 1,
+                date: dt
+            }, function (d, e) {
+                createArticle(d.data.title, d.data.date.curr, d.data.author, d.data.content, d.data.date.prev, d.data.date.next);
+            })
+        }
+        function add0(n) {
+            return n < 10 ? "0" + n : n;
+        }
+    </script>
+</body>
+
+</html>
