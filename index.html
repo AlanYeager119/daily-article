@@ -42,9 +42,9 @@
             createArticle(d.data.title, d.data.date.curr, d.data.author, d.data.content, d.data.date.prev, d.data.date.next);
         })
         function createArticle(title, date, author, content, prev, next) {
-            $("#title").empty().text(title);
-            $("#author").empty().text(author);
-            $("#time").empty().text(date);
+            $("#title").empty().html(title);
+            $("#author").empty().html(author);
+            $("#time").empty().html(date);
             $("#content").empty().html(content);
             prevdate = prev;
             currdate = date;
